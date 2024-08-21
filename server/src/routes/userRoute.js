@@ -5,6 +5,6 @@ const userRouter = express.Router();
 
 
 // Route to get all items (for example)
-userRouter.route('/').get(createUser);
+userRouter.route('/').post(createUser);
 
 export default userRouter;
