@@ -30,6 +30,35 @@ const createUser = asynHandler(async (req, res) => {
 
 })
 
+const loginUser = asynHandler(async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const existingUser = await User.findOne({ email }).select();
+        if(existingUser){
+            const isPasswordValid = await bcrypt.compare(password, existingUser?.password);
+            if(isPasswordValid){
+                res.status(200).json({
+                    _id: existingUser._id,
+                    username: existingUser.username,
+                    email: existingUser.email,
+                    isAdmin: existingUser.isAdmin
+                })
+            }else{
+                res.status(400).json({
+                    message: 'Password is incorredt'
+                })
+            }
+        }else{
+            res.status(401).json({
+                message: 'User not registered'
+            })
+        }
+    } catch (error) {
+        res.status(400);
+        throw new Error('Invalid user data')
+    }
+})
+
 const getAllUser = asynHandler(async (req, res) => {
     const users = User.find()
     res.status(200).json(users);
@@ -37,5 +66,6 @@ const getAllUser = asynHandler(async (req, res) => {
 
 export {
     createUser,
-    getAllUser
+    getAllUser,
+    loginUser
 }
